@@ -1,0 +1,50 @@
+
+
+Add default password/username vals to readme
+
+
+checkout to remote repo "ox ox"
+
+
+
+
+
+
+
+
+
+
+
+
+
+STUDENT END:
+grades
+
+quiz should be submitted as an assignment, taken off roster, and sent to instructor for review 
+
+add chatroom invitations and create-a-chat
+
+
+INSTRUCTOR END: 
+-Add/Edit People
+create new batch
+the edit "back" button on the materials edit doesnt load the tabs
+more question types in the quizzes
+assignment types?
+Add datetime to due dates
+You should be able to create a group of students within a class
+When an instructor starts a forum, that first post gets assigned "master_id" and displays bigger, at the top of the forum
+
+
+people & quizzes are styled differently????
+ROUTES:: all should redirect back to the previous page! use back()->?
+put timestamps on EVERYTHINGGGG
+Fix all timestamps to be human readable
+Match all margin/stylings
+Add timestamps to batch_students
+Improve notifications (opt-in, collect notifications, sort notifications by type, eg graded, to-do, feedback, etc)
+
+
+Admins can create schools & school admins can create courses 
+
+onpaste="return false;" 

@@ -1,0 +1,378 @@
+    <x-list-item :item="$student" link="{{ route('student.profile', ['studentId' => $student['id']]) }}" class="cursor-pointer">
+
+
+
+
+    <livewire:materials-create :course-id="$courseId" />
+
+
+
+
+
+<div>
+    @if($student)
+    <x-card title="{{ $student->user->name }}" subtitle="{{ $student->user->email }}" shadow separator>
+        <x-slot:figure>
+            <img src="https://picsum.photos/500/200" />
+        </x-slot:figure>
+
+        About me: student's bio goes here
+        <x-header title="Courses" size="text-xl" />
+        @foreach($student->batches as $batch)
+        <p>{{$batch->name}}</p>
+        @endforeach
+    </x-card>
+    @else
+    <p>Student not found.</p>
+    @endif
+</div>
+
+
+
+<?php
+
+namespace App\Livewire;
+
+
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Rule;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+
+#[Layout('components.layouts.empty')]
+#[Title('Login')]
+
+    class extends Component {
+
+        #[Rule('required|email')]
+        public string $email = '';
+
+        #[Rule('required')]
+        public string $password = '';
+
+        public function mount()
+        {
+
+            if (auth()->user()) {
+                return redirect('/');
+            }
+        }
+
+        public function login()
+        {
+            $credentials = $this->validate();
+
+            if (auth()->attempt($credentials)) {
+                request()->session()->regenerate();
+
+                return redirect()->intended('/');
+            }
+
+            $this->addError('email', 'The provided credentials do not match our records.');
+        }
+
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // public function mount()
+    // {
+    //     $this->fetchSharedStudents();
+    // }
+
+    // public function fetchSharedStudents()
+    // {
+    //     $currentStudent = Auth::user()->student;
+    //     $sharedBatches = $currentStudent->batches->pluck('id');
+
+    //     $this->sharedStudents = Student::whereHas('batches', function ($query) use ($sharedBatches) {
+    //         $query->whereIn('id', $sharedBatches);
+    //     })
+    //         ->where('id', '!=', $currentStudent->id)
+    //         ->with('user', 'batches')
+    //         ->get();
+    // }
+
+
+
+
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">
+                Students in this batch
+            </h3>
+        </div>
+        <div class="border-t border-gray-200">
+            <ul role="list" class="divide-y divide-gray-200">
+                @forelse($batch->students as $student)
+                <li class="px-4 py-4 sm:px-6">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm font-medium text-indigo-600">
+                            {{ $student->user->name }}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            {{ $student->user->email }}
+                        </div>
+                    </div>
+                </li>
+                @empty
+                <li class="px-4 py-4 sm:px-6 text-gray-500">
+                    No students enrolled in this batch yet.
+                </li>
+                @endforelse
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+    <div>
+
+        @foreach($this->batches as $batch)
+
+        <x-list-item :item="$batch">
+            <x-slot:value>
+                {{ $batch->name}}
+            </x-slot:value>
+
+            @endforeach
+
+        </x-list-item>
+    </div>
+
+
+<!-- use List instead?? that way u can have user icons n stuff -->
+
+
+<div>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        @foreach($this->posts as $post)
+        <x-card title="Post Title Here">
+
+            <p>{{ $post->content }}</p>
+            <x-slot:figure>
+            </x-slot:figure>
+            <x-slot:menu>
+            </x-slot:menu>
+            <x-slot:actions>
+                <x-button label="Reply" class="btn-primary" />
+            </x-slot:actions>
+        </x-card>
+        @endforeach
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-medium mb-4">Add a new post</h2>
+        <x-textarea
+            label="Bio"
+            wire:model="bio"
+            placeholder="Your story ..."
+            hint="Max 1000 chars"
+            rows="5"
+            inline />
+    </div>
+</div>
+
+
+
+
+
+
+<div>
+    <x-header title="Forum Posts" size="text-xl" />
+    <div class="flex justify-center">
+        <div class="w-3/4">
+            @foreach($this->posts as $post)
+            <x-card class="mb-6">
+                <x-slot:header>
+                    <div class="flex items-center">
+                        <div class="font-medium">USER WHO POSTED THE POST</div>
+                        <div class="ml-auto text-gray-500">DATE CREATED AT</div>
+                    </div>
+                </x-slot:header>
+                <x-slot:body>
+                    <div class="text-gray-800">{{ $post->content }}</div>
+                    @if($post->parent_id)
+                    <div class="text-gray-500 mt-2">
+                        <span class="font-medium">Parent ID:</span> {{ $post->parent_id }}
+                    </div>
+                    @endif
+                </x-slot:body>
+            </x-card>
+            @endforeach
+        </div>
+    </div>
+
+    <div class="flex justify-center mt-6">
+        <div class="w-3/4">
+            <x-card>
+                <x-slot:header>
+                    <h2 class="text-lg font-medium">Add a new post</h2>
+                </x-slot:header>
+                <x-slot:body>
+                    <textarea wire:model.defer="newPostContent" class="w-full rounded-md border border-gray-300 p-2 mb-4" rows="3" placeholder="Write your post here..."></textarea>
+                    <x-button wire:click="addPost(newPostContent)" class="bg-blue-500 hover:bg-blue-600 text-white">
+                        Post
+                    </x-button>
+                </x-slot:body>
+            </x-card>
+        </div>
+    </div>
+</div>    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public function getPosts()
+    {
+        $posts = ForumPost::whereNull('parent_id')->with('replies.user')->latest()->get();
+        return $posts;
+
+        Log::info('posts are:', $posts);
+    }
+
+    public function post()
+    {
+        $this->validate(['content' => 'required|string']);
+
+        ForumPost::create([
+            'content' => $this->content,
+            'user_id' => Auth::id(),
+            'parent_id' => null
+        ]);
+
+        $this->content = '';
+    }
+
+    public function reply($postId)
+    {
+        $this->validate(['replyContent' => 'required|string']);
+
+        ForumPost::create([
+            'content' => $this->replyContent,
+            'user_id' => Auth::id(),
+            'parent_id' => $postId
+        ]);
+
+        $this->replyContent = '';
+        $this->replyingTo = null;
+    }
+
+
+    public function setReplyingTo($postId)
+    {
+        $this->replyingTo = $postId;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="bg-white shadow-sm rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-4">Simple Forum</h2>
+
+        <div class="space-y-4">
+            @foreach ($posts as $index => $post)
+            <div class="bg-gray-100 p-4 rounded">
+                <div>{{ $post['content'] }}</div>
+                <div class="mt-2">
+                    @foreach ($post['replies'] as $reply)
+                    <div class="bg-white p-2 rounded mb-2">{{ $reply }}</div>
+                    @endforeach
+                    <div class="flex space-x-2 mt-2">
+                        <input type="text" wire:model.defer="activeReplies.{{ $index }}"
+                            class="flex-1 rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            placeholder="Write a reply..." />
+                        <button wire:click="addReply({{ $index }})"
+                            class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md">Reply</button>
+                    </div>
+                </div>
+                <div class="text-gray-500 text-sm cursor-pointer" wire:click="toggleReplies({{ $index }})">
+                    {{ isset($activeReplies[$index]) ? 'Hide Replies' : 'Show Replies' }}
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        <div class="flex space-x-2 mt-4">
+            <input type="text" wire:model.defer="newPost"
+                class="flex-1 rounded-md border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                placeholder="Write a new post..." />
+            <button wire:click="addPost"
+                class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md">Post</button>
+        </div>
+    </div>
